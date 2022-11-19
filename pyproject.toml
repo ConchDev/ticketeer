@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ticketeer"
+version = "0.1.0"
+description = "A basic ticket bot for Discord"
+authors = ["ConchDev <unsoughtconch@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+py-cord = "^2.2.2"
+python-dotenv = "^0.21.0"
+tortoise-orm = "^0.19.2"
+aerich = "^0.7.1"
+aiosqlite = "^0.17.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
