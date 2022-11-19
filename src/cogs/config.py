@@ -1,11 +1,10 @@
-import discord
 import typing
-from database.models import (
-    Guild,
-    Ticket,
-    TicketMessage,
-    TicketUser
-)
+
+import discord
+
+from database.models import Guild, Ticket, TicketMessage, TicketUser
+from objects.embeds import Error, Success, TicketEmbed
+from objects.views import TicketView
 
 if typing.TYPE_CHECKING:
     from objects import Bot
@@ -28,7 +27,12 @@ class Config(discord.Cog):
         """
         guild: Guild = (await Guild.get_or_create(id=ctx.guild.id))[0]
         await guild.update_from_dict({"ticket_channel": channel.id})
-        await ctx.respond(f"Ticket channel set to {channel.mention}.")
+
+        embed = TicketEmbed(title="Create a Ticket", description="Click the button below to create a ticket.")
+
+        await channel.send(embed=embed, view=TicketView())
+
+        await ctx.respond(embed=Success(description=f"Ticket channel set to {channel.mention}."))
     
 
 def setup(bot: "Bot"):
