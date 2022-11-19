@@ -1,5 +1,5 @@
 import discord
-from src.objects import StartupType
+from objects.enums import StartupType
 import dotenv
 import os
 import logging
@@ -9,30 +9,32 @@ dotenv.load_dotenv()
 
 DB_CONFIG = {
     "connections": {
-        "default": {
-            "engine": "tortoise.backends.aiosqlite",
+        "ticketeer": {
+            "engine": "tortoise.backends.sqlite",
             "credentials": {
-                "file_path": "database.db"
+                "file_path": "src/database/database.db"
             },
         },
     },
     "apps": {
-        "default": {
-            "models": ["src.database.models", "aerich.models"],
+        "ticketeer": {
+            "models": ["database.models", "aerich.models"],
+            "default_connection": "ticketeer",
         }
     }
-},
+}
 
 class Bot(discord.Bot):
     def __init__(self, mode: StartupType):
-        self.intents = discord.Intents.default()
-        self.intents.members = True
+        intents = discord.Intents.default()
+        intents.members = True
         self.logger = logging.getLogger("discord")
 
-        kwargs = {"intents": self.intents}
+        kwargs = {"intents": intents}
 
         if mode == StartupType.dev:
             kwargs["debug_guilds"] = os.getenv("DEBUG_GUILDS").split(",")
+            self.logger.setLevel(logging.DEBUG)
 
         super().__init__(**kwargs)
     
@@ -51,6 +53,7 @@ class Bot(discord.Bot):
         await Tortoise.generate_schemas()
 
         self.logger.info("Connected to database.")
+        print("AA")
     
     async def on_disconnect(self):
         """
@@ -59,6 +62,14 @@ class Bot(discord.Bot):
         """
         self.logger.info("Disconnected from Discord.")
         self.logger.info("Disconnecting from database...")
+        await Tortoise.close_connections()
+        self.logger.info("Disconnected from database.")
+
+    async def close(self):
+        """
+        Closes the bot.
+        """
+        await super().close()
         await Tortoise.close_connections()
 
     async def on_ready(self):
@@ -70,11 +81,11 @@ class Bot(discord.Bot):
     
     def load_cogs(self):
         """
-        Loads all of the cogs in the src/cogs directory.
+        Loads all of the cogs in the cogs directory.
         """
         for filename in os.listdir("src/cogs"):
             if filename.endswith(".py"):
-                self.load_extension(f"src.cogs.{filename[:-3]}")
+                self.load_extension(f"cogs.{filename[:-3]}")
 
     def run(self):
         """
