@@ -53,7 +53,7 @@ class Bot(discord.Bot):
         await Tortoise.generate_schemas()
 
         self.logger.info("Connected to database.")
-        print("AA")
+        await self.sync_commands()
     
     async def on_disconnect(self):
         """

@@ -22,13 +22,13 @@ class Config(discord.Cog):
         )
 
     @set_cmd.command(name="channel")
-    async def command_set_channel(ctx: discord.ApplicationContext, channel: discord.TextChannel):
+    async def command_set_channel(self, ctx: discord.ApplicationContext, channel: discord.Option(discord.TextChannel, description="The channel to set as the ticket channel.")):
         """
         Set the channel where tickets are handled.
         """
-        guild = await Guild.get_or_create(id=ctx.guild.id)
-        await guild.update(ticket_channel=channel.id)
-        await ctx.send(f"Ticket channel set to {channel.mention}.")
+        guild: Guild = (await Guild.get_or_create(id=ctx.guild.id))[0]
+        await guild.update_from_dict({"ticket_channel": channel.id})
+        await ctx.respond(f"Ticket channel set to {channel.mention}.")
     
 
 def setup(bot: "Bot"):
