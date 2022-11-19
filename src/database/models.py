@@ -2,10 +2,12 @@ from tortoise.models import Model
 from tortoise.fields import (
     CharField,
     BigIntField,
+    SmallIntField,
     ManyToManyField,
     ManyToManyRelation,
     BooleanField
 )
+from objects import TicketType
 
 class Ticket(Model):
     id = CharField(max_length=18, pk=True)
@@ -26,7 +28,7 @@ class TicketUser(Model):
     ticket: ManyToManyRelation[Ticket]
 
     is_member = BooleanField(default=False)
-    is_moderator = BooleanField(default=False)
+    is_handler = BooleanField(default=False)
 
     class Meta:
         app = "ticketeer"
@@ -34,6 +36,7 @@ class TicketUser(Model):
 class Guild(Model):
     id = BigIntField(max_length=18, pk=True)
     tickets: ManyToManyRelation[Ticket]
+    ticket_type = SmallIntField(null=True)
     mod_role = BigIntField(null=True)
     ticket_channel = BigIntField(null=True)
     ticket_category = BigIntField(null=True)
