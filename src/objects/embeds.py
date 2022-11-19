@@ -27,3 +27,12 @@ class TicketEmbed(discord.Embed):
             **kwargs,
             color=discord.Color.blurple()
         )
+
+class Info(discord.Embed):
+    def __init__(self, *args, **kwargs):
+        kwargs.pop("color", None)
+        super().__init__(
+            *args,
+            **kwargs,
+            color=discord.Color.blue()
+        )
