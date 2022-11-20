@@ -26,3 +26,40 @@ poetry run prod
 ```
 At the moment, they're basically the same, with differences in the logger.
 
+## Changing the Database
+
+Thanks to Tortoise, swapping out databases from the default SQLite is relatively easy.
+All you need to do is add the Tortoise extra in `pyproject.toml` and swap around the config.
+
+Here's an example with PostgreSQL:
+
+pyproject.toml:
+```toml
+tortoise-orm = { extras = ["asyncpg"], version = "^0.19.2" }
+```
+
+ticketeer/objects/bot.py DB_CONFIG:
+```py
+DB_CONFIG = {
+    "connections": {
+        "ticketeer": {
+            "engine": "tortoise.backends.asyncpg",
+            "credentials": {
+                "host": os.getenv("HOST"),
+                "port": os.getenv("PORT"),
+                "user": os.getenv("USER"),
+                "password": os.getenv("PASS"),
+                "database": os.getenv("DB")
+            },
+        },
+    },
+    "apps": {
+        "ticketeer": {
+            "models": ["ticketeer.database.models", "aerich.models"],
+            "default_connection": "ticketeer",
+        }
+    }
+}
+```
+
+and just like that, the bot will now be configured to use PostgreSQL. If you need to use a different database, please take a look at the official [Tortoise ORM Documentation](https://tortoise.github.io/#pluggable-database-backends)

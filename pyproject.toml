@@ -11,7 +11,6 @@ py-cord = "^2.2.2"
 python-dotenv = "^0.21.0"
 tortoise-orm = "^0.19.2"
 aerich = "^0.7.1"
-aiosqlite = "^0.17.0"
 
 [tool.poetry.scripts]
 dev = "ticketeer.start:dev"
