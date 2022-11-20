@@ -1,12 +1,13 @@
 import discord
-import typing 
+import typing
 if typing.TYPE_CHECKING:
     from objects import Bot
+
 
 class Listeners(discord.Cog):
     def __init__(self, bot: "Bot"):
         self.bot = bot
-    
+
 
 def setup(bot: "Bot"):
     bot.add_cog(Listeners(bot))

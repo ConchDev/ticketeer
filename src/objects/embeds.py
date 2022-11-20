@@ -10,6 +10,7 @@ class Success(discord.Embed):
             color=discord.Color.green()
         )
 
+
 class Error(discord.Embed):
     def __init__(self, *args, **kwargs):
         kwargs.pop("color", None)
@@ -19,6 +20,7 @@ class Error(discord.Embed):
             color=discord.Color.red()
         )
 
+
 class TicketEmbed(discord.Embed):
     def __init__(self, *args, **kwargs):
         kwargs.pop("color", None)
@@ -27,6 +29,7 @@ class TicketEmbed(discord.Embed):
             **kwargs,
             color=discord.Color.blurple()
         )
+
 
 class Info(discord.Embed):
     def __init__(self, *args, **kwargs):

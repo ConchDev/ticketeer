@@ -24,6 +24,7 @@ DB_CONFIG = {
     }
 }
 
+
 class Bot(discord.Bot):
     def __init__(self, mode: StartupType):
         intents = discord.Intents.default()
@@ -37,7 +38,7 @@ class Bot(discord.Bot):
             self.logger.setLevel(logging.DEBUG)
 
         super().__init__(**kwargs)
-    
+
     async def on_connect(self):
         """
         Called when the bot connects to Discord.
@@ -54,7 +55,7 @@ class Bot(discord.Bot):
 
         self.logger.info("Connected to database.")
         await self.sync_commands()
-    
+
     async def on_disconnect(self):
         """
         Called when the bot disconnects from Discord.
@@ -78,7 +79,7 @@ class Bot(discord.Bot):
         """
         self.logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
         self.logger.info("------")
-    
+
     def load_cogs(self):
         """
         Loads all of the cogs in the cogs directory.

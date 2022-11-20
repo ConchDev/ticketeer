@@ -9,6 +9,7 @@ from tortoise.fields import (
 )
 from objects import TicketType
 
+
 class Ticket(Model):
     id = CharField(max_length=18, pk=True)
     guild = ManyToManyField(
@@ -18,10 +19,12 @@ class Ticket(Model):
     )
     users = ManyToManyField("ticketeer.TicketUser", related_name="ticket")
     closed = BooleanField(default=False)
-    messages = ManyToManyField("ticketeer.TicketMessage", related_name="ticket")
+    messages = ManyToManyField(
+        "ticketeer.TicketMessage", related_name="ticket")
 
     class Meta:
         app = "ticketeer"
+
 
 class TicketUser(Model):
     id = CharField(max_length=18, pk=True)
@@ -33,22 +36,27 @@ class TicketUser(Model):
     class Meta:
         app = "ticketeer"
 
+
 class Guild(Model):
     id = BigIntField(max_length=18, pk=True)
     tickets: ManyToManyRelation[Ticket]
-    ticket_type = SmallIntField(null=True)
-    mod_role = BigIntField(null=True)
+    _ticket_type = SmallIntField(null=True, source_field="ticket_type")
+    handler_role = BigIntField(null=True)
     ticket_channel = BigIntField(null=True)
-    ticket_category = BigIntField(null=True)
+
+    @property
+    def ticket_type(self) -> TicketType:
+        return TicketType(self._ticket_type or 0)
 
     class Meta:
         app = "ticketeer"
+
 
 class TicketMessage(Model):
     id = BigIntField(max_length=18, pk=True)
     ticket: ManyToManyRelation[Ticket]
     author: ManyToManyRelation[TicketUser]
     content = CharField(max_length=2000)
-    
+
     class Meta:
         app = "ticketeer"
