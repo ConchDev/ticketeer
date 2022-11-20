@@ -13,6 +13,9 @@ tortoise-orm = "^0.19.2"
 aerich = "^0.7.1"
 aiosqlite = "^0.17.0"
 
+[tool.poetry.scripts]
+dev = "ticketeer.start:dev"
+prod = "ticketeer.start:start"
 
 [build-system]
 requires = ["poetry-core"]

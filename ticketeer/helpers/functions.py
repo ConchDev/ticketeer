@@ -1,5 +1,5 @@
-from database.models import Guild, Ticket, TicketMessage, TicketUser
-from objects import TicketType
+from ticketeer.database.models import Guild, Ticket, TicketMessage, TicketUser
+from ticketeer.objects import TicketType
 from typing import TYPE_CHECKING
 import discord
 

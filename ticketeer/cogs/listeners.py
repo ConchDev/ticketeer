@@ -1,7 +1,7 @@
 import discord
 import typing
 if typing.TYPE_CHECKING:
-    from objects import Bot
+    from ticketeer.objects import Bot
 
 
 class Listeners(discord.Cog):

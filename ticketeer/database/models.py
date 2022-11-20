@@ -7,7 +7,7 @@ from tortoise.fields import (
     ManyToManyRelation,
     BooleanField
 )
-from objects import TicketType
+from ticketeer.objects import TicketType
 
 
 class Ticket(Model):

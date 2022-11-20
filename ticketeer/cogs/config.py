@@ -2,14 +2,14 @@ import typing
 
 import discord
 
-from database.models import Guild, Ticket, TicketMessage, TicketUser
-from objects.embeds import Error, Success, TicketEmbed, Info
-from objects.views import TicketView, ConfigView
-from objects import TicketType
-from helpers.functions import set_channel, set_type, set_handler
+from ticketeer.database.models import Guild, Ticket, TicketMessage, TicketUser
+from ticketeer.objects.embeds import Error, Success, TicketEmbed, Info
+from ticketeer.objects.views import TicketView, ConfigView
+from ticketeer.objects import TicketType
+from ticketeer.helpers.functions import set_channel, set_type, set_handler
 
 if typing.TYPE_CHECKING:
-    from objects import Bot
+    from ticketeer.objects import Bot
 
 
 class Config(discord.Cog):

@@ -1,12 +1,12 @@
 import discord
-from objects import TicketType
-from database.models import Guild
+from ticketeer.objects import TicketType
+from ticketeer.database.models import Guild
 import typing
-from objects.embeds import TicketEmbed, Success, Error
-from helpers.functions import set_channel, set_type, set_handler
+from ticketeer.objects.embeds import TicketEmbed, Success, Error
+from ticketeer.helpers.functions import set_channel, set_type, set_handler
 
 if typing.TYPE_CHECKING:
-    from objects import Bot
+    from ticketeer.objects import Bot
 
 
 class TicketView(discord.ui.View):

@@ -1,5 +1,5 @@
 import discord
-from objects.enums import StartupType
+from ticketeer.objects.enums import StartupType
 import dotenv
 import os
 import logging
@@ -12,13 +12,13 @@ DB_CONFIG = {
         "ticketeer": {
             "engine": "tortoise.backends.sqlite",
             "credentials": {
-                "file_path": "src/database/database.db"
+                "file_path": "ticketeer/database/database.db"
             },
         },
     },
     "apps": {
         "ticketeer": {
-            "models": ["database.models", "aerich.models"],
+            "models": ["ticketeer.database.models", "aerich.models"],
             "default_connection": "ticketeer",
         }
     }
@@ -29,7 +29,11 @@ class Bot(discord.Bot):
     def __init__(self, mode: StartupType):
         intents = discord.Intents.default()
         intents.members = True
-        self.logger = logging.getLogger("discord")
+        self.logger = logging.getLogger("ticketeer")
+        self.logger.warning("Discord.py is using an internal logger.")
+        logging.basicConfig(level=logging.INFO)
+        self.logger.warning("Ticketeer is using an internal logger.")
+
 
         kwargs = {"intents": intents}
 
@@ -78,15 +82,14 @@ class Bot(discord.Bot):
         Called when the bot is ready.
         """
         self.logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
-        self.logger.info("------")
 
     def load_cogs(self):
         """
         Loads all of the cogs in the cogs directory.
         """
-        for filename in os.listdir("src/cogs"):
+        for filename in os.listdir("ticketeer/cogs"):
             if filename.endswith(".py"):
-                self.load_extension(f"cogs.{filename[:-3]}")
+                self.load_extension(f"ticketeer.cogs.{filename[:-3]}")
 
     def run(self):
         """
