@@ -20,15 +20,8 @@ class TicketView(discord.ui.View):
             super().__init__(
                 label="Create Ticket",
                 style=discord.ButtonStyle.blurple,
-                custom_id=f"{ctx.guild.id}-create-ticket"
+                custom_id=f"{ctx.guild.id}-create_ticket"
             )
-
-        async def callback(self, interaction: discord.Interaction):
-            await interaction.response.send_message(
-                "Ticket created!",
-                ephemeral=True
-            )
-
 
 class ConfigView(discord.ui.View):
     def __init__(self, ctx: discord.ApplicationContext, embed: discord.Embed, guild: Guild, bot: "Bot"):

@@ -11,6 +11,7 @@ py-cord = "^2.2.2"
 python-dotenv = "^0.21.0"
 tortoise-orm = "^0.19.2"
 aerich = "^0.7.1"
+shortuuid = "^1.0.11"
 
 [tool.poetry.scripts]
 dev = "ticketeer.start:dev"

@@ -11,7 +11,7 @@ from ticketeer.objects import TicketType
 
 
 class Ticket(Model):
-    id = CharField(max_length=18, pk=True)
+    id = CharField(max_length=10, pk=True)
     guild = ManyToManyField(
         "ticketeer.Guild",
         related_name="tickets",
@@ -27,7 +27,8 @@ class Ticket(Model):
 
 
 class TicketUser(Model):
-    id = CharField(max_length=18, pk=True)
+    id = CharField(max_length=10, pk=True)
+    discord_id = BigIntField()
     ticket: ManyToManyRelation[Ticket]
 
     is_member = BooleanField(default=False)
@@ -43,6 +44,7 @@ class Guild(Model):
     _ticket_type = SmallIntField(null=True, source_field="ticket_type")
     handler_role = BigIntField(null=True)
     ticket_channel = BigIntField(null=True)
+    ticket_category = BigIntField(null=True)
 
     @property
     def ticket_type(self) -> TicketType:
