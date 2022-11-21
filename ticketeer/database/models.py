@@ -8,6 +8,8 @@ from tortoise.fields import (
     BooleanField
 )
 from ticketeer.objects import TicketType
+import discord
+import shortuuid
 
 
 class Ticket(Model):
@@ -36,6 +38,21 @@ class TicketUser(Model):
 
     class Meta:
         app = "ticketeer"
+    
+    @classmethod
+    async def create_from_list(cls, users: list[discord.User | discord.Member], ticket: Ticket, handler_role: discord.Role):
+        ticket_users = []
+        for user in users:
+            is_handler = handler_role in user.roles
+            ticket_user = await cls.create(
+                id=shortuuid.random(length=8),
+                discord_id=user.id,
+                is_member=not is_handler,
+                is_handler=is_handler
+            )
+            await ticket_user.ticket.add(ticket)
+            ticket_users.append(ticket_user)
+        return ticket_users
 
 
 class Guild(Model):

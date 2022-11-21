@@ -9,7 +9,7 @@ Ticketeer is a Discord ticket bot made with Pycord in Python. It uses Tortoise O
 - - [ ] Forum Public
 - - [x] Text Private Thread
 - - [x] Text Public Thread
-- - [ ] Text Private Channel
+- - [x] Text Private Channel
 - - [ ] Text Public Channel
 - [x] Record Ticket messages
 - [ ] Close tickets

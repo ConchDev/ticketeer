@@ -29,7 +29,7 @@ class Listeners(discord.Cog):
 
         if not guild:
             return
-        
+
         if guild.ticket_type == TicketType.none:
             await interaction.response.send_message(
                 embed=Error(
@@ -39,7 +39,7 @@ class Listeners(discord.Cog):
                 ephemeral=True
             )
             return
-        
+
         if guild.ticket_channel is None:
             await interaction.response.send_message(
                 embed=Error(
@@ -49,7 +49,7 @@ class Listeners(discord.Cog):
                 ephemeral=True
             )
             return
-        
+
         private = "private" in guild.ticket_type.name.lower()
         text = "text" in guild.ticket_type.name.lower()
         forum = "forum" in guild.ticket_type.name.lower()
@@ -57,6 +57,7 @@ class Listeners(discord.Cog):
         channel = "channel" in guild.ticket_type.name.lower()
 
         ticket_id = shortuuid.random(length=8)
+        handler_role = interaction.guild.get_role(guild.handler_role)
 
         if text and thread:
             channel_thread = await interaction.channel.create_thread(
@@ -64,35 +65,59 @@ class Listeners(discord.Cog):
                 type=discord.ChannelType.private_thread if private else discord.ChannelType.public_thread,
             )
 
+            ticket_users = [interaction.user]
+
+            if handler_role:
+                ticket_users.extend([member for member in handler_role.members])
+
+            ticket = await Ticket.create(id=ticket_id)
+            await ticket.guild.add(guild)
+
+
+            ticket_users_obj = await TicketUser.create_from_list(ticket_users, ticket, handler_role)
+
+            for user in ticket_users:
+                await channel_thread.add_user(user)
+
+            await ticket.users.add(*ticket_users_obj)
+            await ticket.save()
+
         elif text and channel:
-            # TODO: Create channel within guild.category
-            ...
-        
-        ticket_users = [interaction.user]
+            category = interaction.guild.get_channel(guild.ticket_category)
+            if not category:
+                return
 
-        if role := interaction.guild.get_role(guild.handler_role):
-            ticket_users.extend([member for member in role.members])
+            overwrites = {
+                interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                interaction.user: discord.PermissionOverwrite(
+                    read_messages=True, send_messages=True)
+            }
+            if handler_role:
+                overwrites[handler_role] = discord.PermissionOverwrite(
+                    read_messages=True, send_messages=True)
 
-        ticket = await Ticket.create(id=ticket_id)
-        await ticket.guild.add(guild)
-
-        ticket_user_objs = []
-
-        for user in ticket_users:
-            ticket_user = await TicketUser.create(
-                id=shortuuid.random(length=8),
-                discord_id=interaction.user.id,
-                is_member=not role in user.roles,
-                is_handler=role in user.roles
+            channel = await interaction.guild.create_text_channel(
+                name=f"{interaction.user.name}-ticket-{ticket_id}",
+                category=category,
+                reason=f"Ticket created by {interaction.user} ({interaction.user.id})",
+                overwrites=overwrites
             )
-            await ticket_user.ticket.add(ticket)
-            ticket_user_objs.append(ticket_user)
 
-            await channel_thread.add_user(user)
+            ticket = await Ticket.create(
+                id=ticket_id
+            )
+            await ticket.guild.add(guild)
 
-        await ticket.users.add(*ticket_user_objs)
-        await ticket.save()
-        
+            users = [interaction.user]
+
+            if handler_role:
+                users.extend(handler_role.members)
+
+            users = await TicketUser.create_from_list(users, ticket, handler_role)
+
+            await ticket.users.add(*users)
+            await ticket.save()
+
         await interaction.response.send_message(
             embed=Success(description="Ticket successfully created!"),
             ephemeral=True
@@ -115,6 +140,7 @@ class Listeners(discord.Cog):
         await ticket_message.ticket.add(ticket)
         await ticket_message.author.add(await TicketUser.get_or_create(discord_id=message.author.id))
         await ticket_message.save()
+
 
 def setup(bot: "Bot"):
     bot.add_cog(Listeners(bot))

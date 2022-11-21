@@ -36,7 +36,6 @@ async def set_channel(ctx: discord.ApplicationContext, channel: discord.ChannelT
 @requires_guild
 async def set_type(ctx: discord.ApplicationContext, bot: "Bot", ticket_type: TicketType, **kwargs) -> bool | tuple[bool, str]:
     guild: Guild = kwargs["guild"]
-    print(guild)
 
     channel = bot.get_channel(guild.ticket_channel)
 
