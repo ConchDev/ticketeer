@@ -50,11 +50,13 @@ class Listeners(discord.Cog):
             )
             return
 
-        private = "private" in guild.ticket_type.name.lower()
-        text = "text" in guild.ticket_type.name.lower()
-        forum = "forum" in guild.ticket_type.name.lower()
-        thread = "thread" in guild.ticket_type.name.lower()
-        channel = "channel" in guild.ticket_type.name.lower()
+        ticket_type_name = guild.ticket_type.name.lower().replace("_", " ")
+
+        private = "private" in ticket_type_name
+        text = "text" in ticket_type_name
+        forum = "forum" in ticket_type_name
+        thread = "thread" in ticket_type_name
+        channel = "channel" in ticket_type_name
 
         ticket_id = shortuuid.random(length=8)
         handler_role = interaction.guild.get_role(guild.handler_role)
@@ -68,11 +70,11 @@ class Listeners(discord.Cog):
             ticket_users = [interaction.user]
 
             if handler_role:
-                ticket_users.extend([member for member in handler_role.members])
+                ticket_users.extend(
+                    [member for member in handler_role.members])
 
             ticket = await Ticket.create(id=ticket_id)
             await ticket.guild.add(guild)
-
 
             ticket_users_obj = await TicketUser.create_from_list(ticket_users, ticket, handler_role)
 
@@ -87,11 +89,18 @@ class Listeners(discord.Cog):
             if not category:
                 return
 
-            overwrites = {
-                interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                interaction.user: discord.PermissionOverwrite(
-                    read_messages=True, send_messages=True)
-            }
+            if private:
+                overwrites = {
+                    interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                    interaction.user: discord.PermissionOverwrite(
+                        read_messages=True, send_messages=True)
+                }
+            else:
+                overwrites = {
+                    interaction.user: discord.PermissionOverwrite(
+                        read_messages=True, send_messages=True)
+                }
+                
             if handler_role:
                 overwrites[handler_role] = discord.PermissionOverwrite(
                     read_messages=True, send_messages=True)
