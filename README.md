@@ -3,7 +3,7 @@
 
 Ticketeer is a Discord ticket bot made with Pycord in Python. It uses Tortoise ORM and SQLite as a database, and Poetry as a package manager. While not exactly being for beginners, this open sourced project could help some people understand how to use Tortoise ORM and Pycord.
 
-## TODO
+## To do:
 - [ ] Create tickets:
 - - [ ] Forum Private
 - - [ ] Forum Public
