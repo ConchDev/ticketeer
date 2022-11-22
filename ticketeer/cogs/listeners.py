@@ -1,8 +1,10 @@
 import discord
 import typing
+from io import StringIO
 from ticketeer.database.models import Guild, Ticket, TicketMessage, TicketUser
 from ticketeer.objects.embeds import Success, Error, Info
 from ticketeer.objects import TicketType
+from ticketeer.helpers.functions import unexpected_ticket_close
 import shortuuid
 
 if typing.TYPE_CHECKING:
@@ -58,7 +60,7 @@ class Listeners(discord.Cog):
         thread = "thread" in ticket_type_name
         channel = "channel" in ticket_type_name
 
-        ticket_id = shortuuid.random(length=8)
+        ticket_id = shortuuid.ShortUUID("abcdefghijklmnopqrstuvwxyz1234567890").random(length=8)
         handler_role = interaction.guild.get_role(guild.handler_role)
 
         if text and thread:
@@ -100,7 +102,7 @@ class Listeners(discord.Cog):
                     interaction.user: discord.PermissionOverwrite(
                         read_messages=True, send_messages=True)
                 }
-                
+
             if handler_role:
                 overwrites[handler_role] = discord.PermissionOverwrite(
                     read_messages=True, send_messages=True)
@@ -135,7 +137,7 @@ class Listeners(discord.Cog):
     @discord.Cog.listener(name="on_message")
     async def on_message(self, message: discord.Message):
         try:
-            id = message.channel.name[:8]
+            id = message.channel.name[-8:]
         except:
             return
         ticket = await Ticket.get_or_none(id=id)
@@ -150,6 +152,31 @@ class Listeners(discord.Cog):
         await ticket_message.author.add(await TicketUser.get_or_create(discord_id=message.author.id))
         await ticket_message.save()
 
+    @discord.Cog.listener(name="on_guild_channel_delete")
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
+        ticket_id = channel.name[-8:]
+        status = await unexpected_ticket_close(channel, ticket_id)
+
+        guild = await Guild.get_or_none(id=channel.guild.id)
+
+        transcript_channel = channel.guild.get_channel(guild.transcript_channel)
+
+        print(status)
+        print(transcript_channel)
+        print(guild)
+
+        if not status[0] or not transcript_channel or not guild:
+            return
+
+        await transcript_channel.send(
+            embed=Info(title="Ticket Transcript", description=f"Ticket {ticket_id} has been closed."),
+            file=discord.File(status[1], filename=f"{ticket_id}.txt")
+        )
+
+    
+    @discord.Cog.listener(name="on_raw_thread_delete")
+    async def on_raw_thread_delete(self, payload: discord.RawThreadDeleteEvent):
+        ...
 
 def setup(bot: "Bot"):
     bot.add_cog(Listeners(bot))

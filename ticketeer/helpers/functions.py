@@ -1,5 +1,7 @@
 from ticketeer.database.models import Guild, Ticket, TicketMessage, TicketUser
 from ticketeer.objects import TicketType
+from ticketeer.objects.embeds import Info
+from io import StringIO
 from typing import TYPE_CHECKING
 import discord
 
@@ -58,3 +60,23 @@ async def set_handler(ctx: discord.ApplicationContext, bot: "Bot", role: discord
     await guild.update_from_dict({"handler_role": role.id})
     await guild.save()
     return True
+
+
+async def unexpected_ticket_close(channel: discord.abc.GuildChannel | discord.Thread, ticket_id: str) -> tuple[bool, StringIO | str]:
+    ticket = await Ticket.get_or_none(id=ticket_id)
+
+    if not ticket:
+        return False, "No ticket found with ID {}.".format(ticket_id)
+        
+    transcript = ""
+
+    for message in await ticket.messages.all():
+        await message
+        author = await message.author.get()
+        transcript += f"{message.created_at} {author.name} ({author.discord_id}): {message.content}\n"
+    
+    file = StringIO(transcript)
+
+    await ticket.delete()
+
+    return True, file

@@ -5,7 +5,8 @@ from tortoise.fields import (
     SmallIntField,
     ManyToManyField,
     ManyToManyRelation,
-    BooleanField
+    BooleanField,
+    DatetimeField,
 )
 from ticketeer.objects import TicketType
 import discord
@@ -19,11 +20,18 @@ class Ticket(Model):
         related_name="tickets",
         on_delete="CASCADE"
     )
-    users = ManyToManyField("ticketeer.TicketUser", related_name="ticket")
-    closed = BooleanField(default=False)
+    users = ManyToManyField(
+        "ticketeer.TicketUser",
+        related_name="ticket",
+        on_delete="CASCADE"
+        )
     messages = ManyToManyField(
-        "ticketeer.TicketMessage", related_name="ticket")
-
+        "ticketeer.TicketMessage",
+        related_name="ticket",
+        on_delete="CASCADE"
+        )
+    closed = BooleanField(default=False)
+    
     class Meta:
         app = "ticketeer"
 
@@ -32,6 +40,11 @@ class TicketUser(Model):
     id = CharField(max_length=10, pk=True)
     discord_id = BigIntField()
     ticket: ManyToManyRelation[Ticket]
+    messages = ManyToManyField(
+        "ticketeer.TicketMessage",
+        related_name="author",
+        on_delete="CASCADE"
+        )
 
     is_member = BooleanField(default=False)
     is_handler = BooleanField(default=False)
@@ -62,6 +75,7 @@ class Guild(Model):
     handler_role = BigIntField(null=True)
     ticket_channel = BigIntField(null=True)
     ticket_category = BigIntField(null=True)
+    transcript_channel = BigIntField(null=True)
 
     @property
     def ticket_type(self) -> TicketType:
@@ -73,9 +87,10 @@ class Guild(Model):
 
 class TicketMessage(Model):
     id = BigIntField(max_length=18, pk=True)
+    content = CharField(max_length=2000)
+    created_at = DatetimeField(auto_now_add=True)
     ticket: ManyToManyRelation[Ticket]
     author: ManyToManyRelation[TicketUser]
-    content = CharField(max_length=2000)
 
     class Meta:
         app = "ticketeer"
