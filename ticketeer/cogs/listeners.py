@@ -149,7 +149,7 @@ class Listeners(discord.Cog):
             content=message.content
         )
         await ticket_message.ticket.add(ticket)
-        await ticket_message.author.add(await TicketUser.get_or_create(discord_id=message.author.id))
+        await ticket_message.author.add((await TicketUser.get_or_create(discord_id=message.author.id))[0])
         await ticket_message.save()
 
     @discord.Cog.listener(name="on_guild_channel_delete")

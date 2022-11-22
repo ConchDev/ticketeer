@@ -72,8 +72,9 @@ async def unexpected_ticket_close(channel: discord.abc.GuildChannel | discord.Th
 
     for message in await ticket.messages.all():
         await message
-        author = await message.author.get()
-        transcript += f"{message.created_at} {author.name} ({author.discord_id}): {message.content}\n"
+        author = await message.author
+        print(author)
+        transcript += f"{message.created_at} {author[0].name} ({author.discord_id}): {message.content}\n"
     
     file = StringIO(transcript)
 
